@@ -1,0 +1,5 @@
+target
+project/target
+.idea
+.bsp
+.DS_Store
