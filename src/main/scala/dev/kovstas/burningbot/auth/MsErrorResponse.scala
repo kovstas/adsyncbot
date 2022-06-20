@@ -6,14 +6,15 @@ import org.http4s.EntityDecoder
 import org.http4s.circe.jsonOf
 
 @ConfiguredJsonCodec
-final case class MsTokenResponse(
-    accessToken: String
+final case class MsErrorResponse(
+    error: String,
+    errorDescription: String
 )
 
-object MsTokenResponse {
+object MsErrorResponse {
   implicit val customConfig: Configuration =
     Configuration.default.withSnakeCaseMemberNames
 
-  implicit def decoder[F[_]: Concurrent]: EntityDecoder[F, MsTokenResponse] =
-    jsonOf[F, MsTokenResponse]
+  implicit def decoder[F[_]: Concurrent]: EntityDecoder[F, MsErrorResponse] =
+    jsonOf[F, MsErrorResponse]
 }

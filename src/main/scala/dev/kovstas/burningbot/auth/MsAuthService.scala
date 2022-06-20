@@ -26,6 +26,9 @@ final class DefaultMsAuthService(msAuthClient: MsAuthClient[IO])
   ): IO[Unit] =
     msAuthClient
       .tenantServiceToken(tenantId)
+      .handleErrorWith(e =>
+        logger.warn(e.getMessage).flatMap(_ => IO.raiseError(e))
+      )
       .flatTap(r => logger.info(s"Access token received - $r"))
       .void
 

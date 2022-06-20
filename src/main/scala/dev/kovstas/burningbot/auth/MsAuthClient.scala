@@ -4,7 +4,7 @@ import cats.effect.IO
 import dev.kovstas.burningbot.config.MsAuthConfig
 import dev.kovstas.burningbot.model.Team.ADTenantId
 import org.http4s.Method.POST
-import org.http4s.UrlForm
+import org.http4s._
 import org.http4s.client.Client
 import org.http4s.client.dsl.io._
 
@@ -24,9 +24,21 @@ final class DefaultMsAuthClient(httpClient: Client[IO], config: MsAuthConfig)
         "scope" -> "https://graph.microsoft.com/.default",
         "grant_type" -> "client_credentials"
       ),
-      config.host / "/oauth2" / "v2.0" / "token"
+      config.host / tenantId.value / "oauth2" / "v2.0" / "token"
     )
-    httpClient.expect[MsTokenResponse](request)
+    httpClient.expectOr[MsTokenResponse](request)(defaultErrorHandler)
+  }
+
+  private val defaultErrorHandler: Response[IO] => IO[Throwable] = res => {
+    EntityDecoder[IO, MsErrorResponse]
+      .decode(res, strict = true)
+      .value
+      .map {
+        case Left(d) =>
+          new IllegalStateException(d.getMessage())
+        case Right(error) =>
+          AuthenticationError(error.errorDescription)
+      }
   }
 
 }

@@ -24,6 +24,7 @@ lazy val root = (project in file("."))
         "org.http4s" %% "http4s-circe" % http4sVersion,
         "io.circe" %% "circe-core" % circeVersion,
         "io.circe" %% "circe-generic" % circeVersion,
+        "io.circe" %% "circe-generic-extras" % circeVersion,
         "com.beachape" %% "enumeratum" % enumeratumVersion,
         "io.estatico" %% "newtype" % "0.4.4",
         "org.augustjune" %% "canoe" % "0.6.0",
