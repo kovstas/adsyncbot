@@ -1,5 +1,6 @@
-package dev.kovstas.burningbot.config
+package dev.kovstas.adsyncbot.config
 
+import dev.kovstas.adsyncbot.user.User.UserId
 import org.http4s.Uri
 import pureconfig.ConfigReader
 import pureconfig.generic.semiauto.deriveReader
@@ -11,12 +12,12 @@ final case class MsAuthConfig(
     clientSecret: String,
     redirectUri: Uri
 ) {
-  val authoriseLink: Uri =
+  def authoriseLink(userId: UserId): Uri =
     (host / tenantId / "adminconsent").withQueryParams(
       Map(
         "client_id" -> clientId,
         "redirect_uri" -> redirectUri.renderString,
-        "state" -> "12345"
+        "state" -> s"${userId.value}"
       )
     )
 }

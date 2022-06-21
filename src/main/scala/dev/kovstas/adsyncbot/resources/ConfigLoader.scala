@@ -1,4 +1,4 @@
-package dev.kovstas.burningbot.resources
+package dev.kovstas.adsyncbot.resources
 
 import cats.data.EitherT
 import cats.effect.{IO, Resource}

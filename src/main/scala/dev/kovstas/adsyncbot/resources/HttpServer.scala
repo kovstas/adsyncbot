@@ -1,11 +1,11 @@
-package dev.kovstas.burningbot.resources
+package dev.kovstas.adsyncbot.resources
 
 import cats.effect.Async
 import cats.effect.kernel.Resource
 import cats.{Applicative, Monad}
 import com.comcast.ip4s._
-import dev.kovstas.burningbot.auth.{MsAuthRoute, MsAuthService}
-import org.http4s.{HttpApp, HttpRoutes, Response}
+import dev.kovstas.adsyncbot.auth.{MsAuthRoute, MsAuthService}
+import org.http4s.{HttpApp, HttpRoutes, Response, Uri}
 import org.http4s.dsl.io._
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits._
@@ -14,11 +14,14 @@ import org.http4s.server.{Router, Server}
 
 object HttpServer {
 
-  def makeHttpApp[F[_]: Async](msAuthService: MsAuthService[F]): HttpApp[F] = {
+  def makeHttpApp[F[_]: Async](
+      botUri: Uri,
+      msAuthService: MsAuthService[F]
+  ): HttpApp[F] = {
     Logger.httpApp(logHeaders = true, logBody = true)(
       Router(
         "/api/v1/" -> route,
-        "/api/v1/auth/" -> MsAuthRoute.make(msAuthService)
+        "/api/v1/auth/" -> MsAuthRoute.make(botUri, msAuthService)
       ).orNotFound
     )
   }

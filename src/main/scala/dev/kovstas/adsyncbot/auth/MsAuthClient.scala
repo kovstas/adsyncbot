@@ -1,22 +1,22 @@
-package dev.kovstas.burningbot.auth
+package dev.kovstas.adsyncbot.auth
 
 import cats.effect.IO
-import dev.kovstas.burningbot.config.MsAuthConfig
-import dev.kovstas.burningbot.model.Team.ADTenantId
+import dev.kovstas.adsyncbot.config.MsAuthConfig
+import dev.kovstas.adsyncbot.model.Company.ADTenantId
 import org.http4s.Method.POST
 import org.http4s._
 import org.http4s.client.Client
 import org.http4s.client.dsl.io._
 
 trait MsAuthClient[F[_]] {
-  def tenantServiceToken(
+  def loginCompany(
       tenantId: ADTenantId
   ): F[MsTokenResponse]
 }
 
 final class DefaultMsAuthClient(httpClient: Client[IO], config: MsAuthConfig)
     extends MsAuthClient[IO] {
-  override def tenantServiceToken(tenantId: ADTenantId): IO[MsTokenResponse] = {
+  override def loginCompany(tenantId: ADTenantId): IO[MsTokenResponse] = {
     val request = POST(
       UrlForm(
         "client_id" -> config.clientId,

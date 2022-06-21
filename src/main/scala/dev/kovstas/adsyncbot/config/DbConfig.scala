@@ -1,4 +1,4 @@
-package dev.kovstas.burningbot.config
+package dev.kovstas.adsyncbot.config
 
 import pureconfig.ConfigReader
 import pureconfig.generic.semiauto.deriveReader

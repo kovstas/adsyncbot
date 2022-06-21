@@ -1,4 +1,4 @@
-package dev.kovstas.burningbot
+package dev.kovstas.adsyncbot
 
 import io.estatico.newtype.macros.newtype
 

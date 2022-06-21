@@ -1,4 +1,4 @@
-package dev.kovstas.burningbot.resources
+package dev.kovstas.adsyncbot.resources
 
 import cats.effect.Resource
 import cats.effect.kernel.Async

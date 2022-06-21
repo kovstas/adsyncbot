@@ -1,7 +1,7 @@
 lazy val root = (project in file("."))
   .enablePlugins(DockerPlugin, JavaAppPackaging)
   .settings(
-    name := "burning_bot",
+    name := "adsyncbot",
     organizationName := "dev.kovstas",
     scalaVersion := "2.13.8",
     scalacOptions += "-Ymacro-annotations",

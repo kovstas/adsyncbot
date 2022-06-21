@@ -1,9 +1,9 @@
-package dev.kovstas.burningbot.resources
+package dev.kovstas.adsyncbot.resources
 
 import cats.effect.kernel.Async
 import cats.effect.{IO, Resource, Sync}
 import cats.implicits.catsSyntaxOptionId
-import dev.kovstas.burningbot.config.DbConfig
+import dev.kovstas.adsyncbot.config.DbConfig
 import doobie.hikari.HikariTransactor
 import doobie.util.ExecutionContexts
 import fly4s.core.Fly4s
@@ -18,7 +18,8 @@ object DB {
       password = config.pass.toCharArray.some,
       config = Fly4sConfig(
         table = "flyway",
-        locations = Location.of("db")
+        locations = Location.of("db"),
+        baselineOnMigrate = true
       )
     )
     .evalMap(_.migrate)
