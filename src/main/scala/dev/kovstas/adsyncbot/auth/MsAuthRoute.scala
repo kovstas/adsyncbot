@@ -2,7 +2,7 @@ package dev.kovstas.adsyncbot.auth
 
 import cats.Monad
 import cats.syntax.all._
-import dev.kovstas.adsyncbot.model.Company.ADTenantId
+import dev.kovstas.adsyncbot.organization.Organization.ADTenantId
 import dev.kovstas.adsyncbot.user.User.UserId
 import java.util.UUID
 import org.http4s.Method.GET
@@ -12,6 +12,9 @@ import org.http4s.{HttpRoutes, ParseFailure, QueryParamDecoder, Response, Uri}
 import scala.util.Try
 
 object MsAuthRoute {
+
+  object AccessTokenParam
+      extends QueryParamDecoderMatcher[String]("access_token")
 
   object TenantIdParam
       extends QueryParamDecoderMatcher[ADTenantId]("tenant")(
@@ -36,12 +39,22 @@ object MsAuthRoute {
       msAuthService: MsAuthService[F]
   ): HttpRoutes[F] =
     HttpRoutes.of[F] {
-      case _ @GET -> Root / "company-login" :?
+      case _ @GET -> Root / "organization-login" :?
           AdminConsentParam(adminConsent) +&
           TenantIdParam(tenantId) +&
           UserIdParam(userId) =>
         msAuthService
-          .companyLogin(adminConsent, tenantId, userId)
+          .organizationLogin(adminConsent, tenantId, userId)
+          .as(
+            Response[F]()
+              .withStatus(MovedPermanently)
+              .withHeaders(Location(botUri))
+          )
+      case _ @GET -> Root / "organization-member-login" :?
+          UserIdParam(userId) +&
+          AccessTokenParam(accessToken) =>
+        msAuthService
+          .organizationMemberLogin(accessToken, userId)
           .as(
             Response[F]()
               .withStatus(MovedPermanently)

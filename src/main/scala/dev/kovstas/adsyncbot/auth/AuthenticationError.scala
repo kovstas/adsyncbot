@@ -10,3 +10,11 @@ final case class AuthenticationError(cause: String) extends NoStackTrace {
 final case class UserNotFound(userId: UserId) extends NoStackTrace {
   override def getMessage: String = s"The user with '$userId' isn't found"
 }
+
+final case class UserInActive(userId: UserId) extends NoStackTrace {
+  override def getMessage: String = s"The user with '$userId' isn't active'"
+}
+
+final case class OrganizationNotFound(name: String) extends NoStackTrace {
+  override def getMessage: String = s"The $name organization isn't found"
+}

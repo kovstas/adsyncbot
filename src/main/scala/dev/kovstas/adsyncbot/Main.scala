@@ -4,12 +4,8 @@ import canoe.api._
 import cats.effect.{ExitCode, IO, IOApp, Resource}
 import dev.kovstas.adsyncbot.auth.{DefaultMsAuthClient, DefaultMsAuthService}
 import dev.kovstas.adsyncbot.config.AppConfig
-import dev.kovstas.adsyncbot.resources.{
-  ConfigLoader,
-  DB,
-  HttpClient,
-  HttpServer
-}
+import dev.kovstas.adsyncbot.resources.{ConfigLoader, DB, HttpClient, HttpServer}
+import dev.kovstas.adsyncbot.telegram.StartScenario
 
 object Main extends IOApp {
 
@@ -27,7 +23,7 @@ object Main extends IOApp {
 
       appServices = AppServices()
 
-      scenario = new MainScenario(
+      scenario = new StartScenario(
         appServices.userService,
         //appServices.companyService,
         appConfig.ms
@@ -40,7 +36,7 @@ object Main extends IOApp {
           new DefaultMsAuthService(
             new DefaultMsAuthClient(httpClient, appConfig.ms),
             telegramClient = client,
-            companyService = appServices.companyService,
+            organizationService = appServices.companyService,
             userService = appServices.userService
           )
         )

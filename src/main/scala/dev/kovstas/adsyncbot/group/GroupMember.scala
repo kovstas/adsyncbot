@@ -1,14 +1,14 @@
-package dev.kovstas.adsyncbot.model
+package dev.kovstas.adsyncbot.group
 
-import dev.kovstas.adsyncbot.model.CompanyUser.CompanyUserId
-import dev.kovstas.adsyncbot.model.Group.GroupId
+import dev.kovstas.adsyncbot.group.Group.GroupId
+import dev.kovstas.adsyncbot.organization.OrganizationMember.OrganizationMemberId
 import io.estatico.newtype.macros.newtype
 import java.time.Instant
 import java.util.UUID
 
 final case class GroupMember(
     groupId: GroupId,
-    companyUserId: CompanyUserId,
+    organizationMemberId: OrganizationMemberId,
     createdAt: Instant
 )
 

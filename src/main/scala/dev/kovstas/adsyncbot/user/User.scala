@@ -1,6 +1,6 @@
 package dev.kovstas.adsyncbot.user
 
-import dev.kovstas.adsyncbot.model.TgChatId
+import dev.kovstas.adsyncbot.telegram.TgChatId
 import dev.kovstas.adsyncbot.user.User.UserId
 import io.estatico.newtype.macros.newtype
 import java.time.Instant

@@ -1,7 +1,9 @@
-package dev.kovstas.adsyncbot.model
+package dev.kovstas.adsyncbot.group
 
-import dev.kovstas.adsyncbot.model.Company.CompanyId
-import dev.kovstas.adsyncbot.model.Group._
+import dev.kovstas.adsyncbot.group.Group._
+import dev.kovstas.adsyncbot.organization.Organization.OrganizationId
+import dev.kovstas.adsyncbot.telegram.TgChatId
+import io.circe.Decoder
 import io.estatico.newtype.macros.newtype
 import java.time.Instant
 import java.util.UUID
@@ -9,7 +11,7 @@ import java.util.UUID
 final case class Group(
     id: GroupId,
     name: GroupName,
-    companyId: CompanyId,
+    organizationId: OrganizationId,
     tgChatId: TgChatId,
     adGroupId: AdGroupId,
     isActive: Boolean,
@@ -20,5 +22,8 @@ final case class Group(
 object Group {
   @newtype case class GroupId(value: UUID)
   @newtype case class AdGroupId(value: String)
+  object AdGroupId {
+    implicit val decoder: Decoder[AdGroupId] = deriving[Decoder]
+  }
   @newtype case class GroupName(value: String)
 }
