@@ -3,7 +3,7 @@ CREATE TYPE chat_member_role AS ENUM ('owner','admin','member');
 CREATE TABLE "user"
 (
     id         uuid PRIMARY KEY         NOT NULL,
-    name       VARCHAR                  NOT NULL,
+    name       VARCHAR,
     is_active  BOOLEAN                  NOT NULL,
     tg_chat_id BIGINT                   NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,

@@ -10,7 +10,7 @@ import java.util.UUID
 
 final case class User(
     id: UserId,
-    name: String,
+    name: Option[String],
     tgChatId: TgChatId,
     isActive: Boolean,
     createdAt: Instant,
