@@ -108,13 +108,7 @@ final class DefaultChatService[F[
             .void
         case None =>
           tgGroup.administrators.flatMap { members =>
-            if (members.exists(_.user.id == botId))
-              tgGroup
-                .send(
-                  "The bot must be an administrator. Please, change its role."
-                )
-                .void
-            else {
+            if (members.exists(m => m.user.id == botId)) {
               val tgOwnerIdOpt: Option[TgChatId] =
                 members.collectFirst {
                   case owner: ChatCreator if !owner.user.isBot =>
@@ -174,6 +168,12 @@ final class DefaultChatService[F[
                       "Can't connect the organization to the chat"
                     )
                 }
+            } else {
+              tgGroup
+                .send(
+                  "The bot must be an administrator. Please, change its role."
+                )
+                .void
             }
 
           }
