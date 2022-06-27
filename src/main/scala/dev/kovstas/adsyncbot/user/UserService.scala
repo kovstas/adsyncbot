@@ -9,23 +9,27 @@ import canoe.models.{
   PrivateChat
 }
 import canoe.syntax._
-import cats.Monad
+import cats.MonadThrow
 import cats.syntax.all._
 import dev.kovstas.adsyncbot.auth.OAuthHelper.organizationAuthoriseLink
 import dev.kovstas.adsyncbot.config.MsConfig
 import dev.kovstas.adsyncbot.organization.OrganizationRepo
 import dev.kovstas.adsyncbot.telegram.{
   TgChatId,
+  UnknownErrorMessage,
   loginAsOrganizationMemberButton
 }
 import dev.kovstas.adsyncbot.user.User.UserId
 import org.typelevel.log4cats.StructuredLogger
+import scala.util.control.NonFatal
 
 trait UserService[F[_]] {
   def create(chat: PrivateChat): F[Unit]
 }
 
-final class DefaultUserService[F[_]: Monad: TelegramClient: StructuredLogger](
+final class DefaultUserService[F[
+    _
+]: MonadThrow: TelegramClient: StructuredLogger](
     userRepo: UserRepo[F],
     organizationRepo: OrganizationRepo[F],
     msConfig: MsConfig
@@ -36,7 +40,7 @@ final class DefaultUserService[F[_]: Monad: TelegramClient: StructuredLogger](
     val logger =
       StructuredLogger[F].addContext(Map("chatId" -> chat.id.toString))
 
-    for {
+    (for {
       userOpt <- userRepo.userByTgUserId(tgUserId)
       userState <- userOpt.traverse { user =>
         for {
@@ -98,7 +102,10 @@ final class DefaultUserService[F[_]: Monad: TelegramClient: StructuredLogger](
             _ <- sendHelloMsg(chat, userId)
           } yield ()
       }
-    } yield ()
+    } yield ()).recoverWith { case NonFatal(ex) =>
+      logger.error(ex)("Exception during creation a user") <*
+        chat.send(UnknownErrorMessage)
+    }
 
   }
 

@@ -25,4 +25,7 @@ package object telegram {
         userId
       ).renderString
     )
+
+  val UnknownErrorMessage: String =
+    "Unknown error. Please, try again later or write about the problem to the bot maintainer."
 }

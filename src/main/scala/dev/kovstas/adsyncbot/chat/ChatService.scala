@@ -15,7 +15,7 @@ import dev.kovstas.adsyncbot.auth.{UserInActive, UserNotFound}
 import dev.kovstas.adsyncbot.organization.Organization.OrganizationId
 import dev.kovstas.adsyncbot.organization.OrganizationMember.OrganizationMemberId
 import dev.kovstas.adsyncbot.organization.OrganizationRepo
-import dev.kovstas.adsyncbot.telegram.TgChatId
+import dev.kovstas.adsyncbot.telegram.{TgChatId, UnknownErrorMessage}
 import dev.kovstas.adsyncbot.user.User.UserId
 import dev.kovstas.adsyncbot.user.UserRepo
 import org.typelevel.log4cats.StructuredLogger
@@ -181,7 +181,7 @@ final class DefaultChatService[F[
       }
       .recoverWith { case NonFatal(ex) =>
         logger.error(ex)("Exception during creation a chat") <*
-          tgGroup.send("Unknown error. Please, try again later.")
+          tgGroup.send(UnknownErrorMessage)
       }
   }
 
