@@ -1,13 +1,13 @@
 package dev.kovstas.adsyncbot.auth
 
-import dev.kovstas.adsyncbot.config.MsAuthConfig
+import dev.kovstas.adsyncbot.config.MsConfig
 import dev.kovstas.adsyncbot.user.User.UserId
 import org.http4s.Uri
 
 object OAuthHelper {
 
-  def companyAuthoriseLink(config: MsAuthConfig, userId: UserId): Uri =
-    (config.host / "organizations" / "adminconsent").withQueryParams(
+  def organizationAuthoriseLink(config: MsConfig, userId: UserId): Uri =
+    (config.loginUri / "common" / "adminconsent").withQueryParams(
       Map(
         "client_id" -> config.clientId,
         "redirect_uri" -> config.organizationLoginRedirect.renderString,
@@ -15,15 +15,16 @@ object OAuthHelper {
       )
     )
 
-  def companyMemberAuthoriseLink(
-      config: MsAuthConfig,
+  def organizationMemberAuthoriseLink(
+      config: MsConfig,
       userId: UserId
   ): Uri =
-    (config.host / "organizations" / "oauth2" / "v2.0" / "authorize")
+    (config.loginUri / "organizations" / "oauth2" / "v2.0" / "authorize")
       .withQueryParams(
         Map(
           "client_id" -> config.clientId,
           "response_type" -> "token",
+          "response_mode" -> "form_post",
           "redirect_uri" -> config.organizationMemberLoginRedirect.renderString,
           "scope" -> "user.read openid profile email",
           "state" -> userId.value.toString

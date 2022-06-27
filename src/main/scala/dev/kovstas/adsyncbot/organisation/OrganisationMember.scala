@@ -6,6 +6,8 @@ import dev.kovstas.adsyncbot.organization.OrganizationMember.{
   OrganizationMemberId
 }
 import dev.kovstas.adsyncbot.user.User.UserId
+import doobie.postgres.implicits._
+import doobie.Meta
 import io.circe.Decoder
 import io.estatico.newtype.macros.newtype
 import java.time.Instant
@@ -26,8 +28,14 @@ final case class OrganizationMember(
 
 object OrganizationMember {
   @newtype case class OrganizationMemberId(value: UUID)
+  object OrganizationMemberId {
+    implicit val meta: Meta[OrganizationMemberId] = deriving[Meta]
+  }
+
   @newtype case class AdUserId(value: String)
   object AdUserId {
     implicit val decoder: Decoder[AdUserId] = deriving[Decoder]
+    implicit val meta: Meta[AdUserId] = deriving[Meta]
+
   }
 }

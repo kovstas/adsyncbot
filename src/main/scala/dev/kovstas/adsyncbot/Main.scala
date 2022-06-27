@@ -2,10 +2,10 @@ package dev.kovstas.adsyncbot
 
 import canoe.api._
 import cats.effect.{ExitCode, IO, IOApp, Resource}
-import dev.kovstas.adsyncbot.auth.{DefaultMsAuthClient, DefaultMsAuthService}
 import dev.kovstas.adsyncbot.config.AppConfig
-import dev.kovstas.adsyncbot.resources.{ConfigLoader, DB, HttpClient, HttpServer}
-import dev.kovstas.adsyncbot.telegram.StartScenario
+import dev.kovstas.adsyncbot.resources._
+import org.typelevel.log4cats.SelfAwareStructuredLogger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object Main extends IOApp {
 
@@ -14,41 +14,27 @@ object Main extends IOApp {
       (_, appConfig) <- ConfigLoader.load[AppConfig]
       httpClient <- HttpClient.make[IO]
       _ <- DB.migrateDb(appConfig.db)
-      _ <- DB.transactor[IO](appConfig.db)
+      transactor <- DB.transactor[IO](appConfig.db)
+      repos = Repos(transactor)
 
-      implicit0(client: TelegramClient[IO]) = TelegramClient
+      implicit0(logger: SelfAwareStructuredLogger[IO]) <- Resource.eval(
+        Slf4jLogger.create[IO]
+      )
+
+      implicit0(telegramClient: TelegramClient[IO]) = TelegramClient
         .fromHttp4sClient[IO](
           appConfig.token
         )(httpClient)
 
-      appServices = AppServices()
-
-      scenario = new StartScenario(
-        appServices.userService,
-        //appServices.companyService,
-        appConfig.ms
-      )
+      appServices = AppServices(repos, httpClient, appConfig.ms)
+      _ <- Processes(appServices)
 
       _ <- HttpServer.make[IO](
         appConfig.port,
-        HttpServer.makeHttpApp(
-          appConfig.botUri,
-          new DefaultMsAuthService(
-            new DefaultMsAuthClient(httpClient, appConfig.ms),
-            telegramClient = client,
-            organizationService = appServices.companyService,
-            userService = appServices.userService
-          )
-        )
+        appConfig.botUri,
+        appServices.oAuthService
       )
 
-      _ <- Resource.eval(
-        Bot
-          .polling[IO]
-          .follow(scenario.start)
-          .compile
-          .drain
-      )
     } yield ()).use(_ => IO.never).as(ExitCode.Success)
   }
 }

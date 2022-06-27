@@ -10,7 +10,7 @@ final case class AppConfig(
     botUri: Uri,
     token: String,
     db: DbConfig,
-    ms: MsAuthConfig
+    ms: MsConfig
 )
 
 object AppConfig extends PureConfig {
