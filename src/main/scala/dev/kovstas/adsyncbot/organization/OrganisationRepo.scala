@@ -73,7 +73,7 @@ final class PostgresOrganizationRepo[F[_]: MonadCancelThrow](
 
     sql"""
        INSERT INTO organization (id, ad_tenant_id, name, created_by, is_active, created_at, updated_at)
-       VALUES ($id, $tenantId, $name, true, $createdBy, $now, $now)
+       VALUES ($id, $tenantId, $name, $createdBy, true, $now, $now)
     """.update.run.transact(transactor).as(id)
   }
 

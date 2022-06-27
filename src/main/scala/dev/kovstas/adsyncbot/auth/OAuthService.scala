@@ -50,10 +50,14 @@ final class DefaultOAuthService[
         .addOrganizationMember(userId, accessToken)
         .attempt
       _ <- r match {
-        case Right((orgName, _)) =>
+        case Right((orgName, isOwner)) =>
+          val additionalInfo = if (isOwner) {
+            "Now you can add the bot to your telegram chats."
+          } else
+            "You can ask the admin of organization to add you to organization telegram chats."
           logger.debug(s"Organization member was added to $orgName") *>
             userChat.send(
-              s"You successfully connected with '$orgName' organization. You can ask the admin of organization to add you to organization telegram chats."
+              s"You successfully connected with '$orgName' organization. $additionalInfo"
             )
         case Left(e @ OrganizationNotFound(name)) =>
           logger.warn(e)(e.getMessage) *>

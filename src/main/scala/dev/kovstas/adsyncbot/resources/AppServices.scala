@@ -12,7 +12,7 @@ import dev.kovstas.adsyncbot.az.{
   DefaultUserGraphApi
 }
 import dev.kovstas.adsyncbot.chat.{ChatService, DefaultChatService}
-import dev.kovstas.adsyncbot.config.MsConfig
+import dev.kovstas.adsyncbot.config.AppConfig
 import dev.kovstas.adsyncbot.organization.{
   DefaultOrganizationService,
   OrganizationService
@@ -33,24 +33,25 @@ object AppServices {
   def apply[F[_]: Concurrent: TelegramClient: StructuredLogger](
       repos: Repos[F],
       httpClient: Client[F],
-      config: MsConfig
+      config: AppConfig
   ): AppServices[F] = {
 
     val authClient = new DefaultOAuthClient[F](
       httpClient,
-      config
+      config.ms
     )
 
     val appGraphApi =
-      new DefaultApplicationGraphApi[F](authClient, httpClient, config)
+      new DefaultApplicationGraphApi[F](authClient, httpClient, config.ms)
 
     val userGraphApi =
-      new DefaultUserGraphApi[F](httpClient, config)
+      new DefaultUserGraphApi[F](httpClient, config.ms)
 
     val chatService = new DefaultChatService[F](
       repos.organizationRepo,
       repos.userRepo,
-      repos.chatRepo
+      repos.chatRepo,
+      config.tg.botId
     )
 
     val organizationService = new DefaultOrganizationService[F](
@@ -63,13 +64,13 @@ object AppServices {
     val userService = new DefaultUserService[F](
       repos.userRepo,
       repos.organizationRepo,
-      config
+      config.ms
     )
 
     val oAuthService = new DefaultOAuthService[F](
       organizationService,
       chatService,
-      config
+      config.ms
     )
 
     new AppServices(

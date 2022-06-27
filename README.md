@@ -64,6 +64,7 @@ Environment variables:
 - `MS_CLIENT_ID` - AD application ID
 - `MS_CLIENT_SECRET` - AD application secret
 - `BOT_URI` - bot uri (default: `https://t.me/AdSyncBot`)
+- `BOT_ID` - bot id (default: `5537852768`)
 - `OAUTH_LOGIN_REDIRECT` - organization login redirect uri (default: `http://localhost:8080/api/v1/auth/organization-login`)
 - `OAUTH_LOGIN_REDIRECT` - user login redirect uri (default: `http://localhost:8080/api/v1/auth/organization-member-login`)
 

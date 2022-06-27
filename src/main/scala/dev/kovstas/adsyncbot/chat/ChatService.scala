@@ -38,7 +38,8 @@ final class DefaultChatService[F[
 ]: TelegramClient: StructuredLogger: MonadThrow](
     organizationRepo: OrganizationRepo[F],
     userRepo: UserRepo[F],
-    chatRepo: ChatRepo[F]
+    chatRepo: ChatRepo[F],
+    botId: Long
 ) extends ChatService[F] {
 
   override def deleteMember(tgChatId: TgChatId, tgUserId: TgChatId): F[Unit] = {
@@ -107,64 +108,73 @@ final class DefaultChatService[F[
             .void
         case None =>
           tgGroup.administrators.flatMap { members =>
-            val tgOwnerIdOpt: Option[TgChatId] =
-              members.collectFirst {
-                case owner: ChatCreator if !owner.user.isBot =>
-                  TgChatId(owner.user.id)
-              }
+            if (members.exists(_.user.id == botId))
+              tgGroup
+                .send(
+                  "The bot must be an administrator. Please, change its role."
+                )
+                .void
+            else {
+              val tgOwnerIdOpt: Option[TgChatId] =
+                members.collectFirst {
+                  case owner: ChatCreator if !owner.user.isBot =>
+                    TgChatId(owner.user.id)
+                }
 
-            val tgAdminsChatId =
-              members.collect {
-                case admin: ChatAdministrator if !admin.user.isBot =>
-                  TgChatId(admin.user.id)
-              }
+              val tgAdminsChatId =
+                members.collect {
+                  case admin: ChatAdministrator if !admin.user.isBot =>
+                    TgChatId(admin.user.id)
+                }
 
-            tgOwnerIdOpt
-              .flatTraverse(organizationRepo.getOrganizationMemberByTgUserId)
-              .flatMap {
-                case Some(orgMember) =>
-                  val loggerOrg = logger.addContext(
-                    Map(
-                      "organizationId" -> orgMember.organizationId.value.toString
-                    )
-                  )
-                  for {
-                    _ <- loggerOrg.debug("Start creating chat...")
-                    chatId <- chatRepo.createChat(
-                      tgGroupId,
-                      orgMember.organizationId,
-                      tgGroup.title
-                    )
-                    _ <- chatRepo.addMember(
-                      chatId,
-                      orgMember.id,
-                      ChatMemberRole.Owner
-                    )
-                    admins <- tgAdminsChatId.flatTraverse(id =>
-                      organizationRepo
-                        .getOrganizationMemberByTgUserId(id)
-                        .map(_.toList)
-                    )
-                    _ <- admins.traverse(orgMember =>
-                      chatRepo.addMember(
-                        chatId,
-                        orgMember.id,
-                        ChatMemberRole.Admin
+              tgOwnerIdOpt
+                .flatTraverse(organizationRepo.getOrganizationMemberByTgUserId)
+                .flatMap {
+                  case Some(orgMember) =>
+                    val loggerOrg = logger.addContext(
+                      Map(
+                        "organizationId" -> orgMember.organizationId.value.toString
                       )
                     )
-                    _ <- loggerOrg.debug("The chat was created")
-                    _ <- tgGroup.send(
-                      "The chat was successfully connected to organization."
+                    for {
+                      _ <- loggerOrg.debug("Start creating chat...")
+                      chatId <- chatRepo.createChat(
+                        tgGroupId,
+                        orgMember.organizationId,
+                        tgGroup.title
+                      )
+                      _ <- chatRepo.addMember(
+                        chatId,
+                        orgMember.id,
+                        ChatMemberRole.Owner
+                      )
+                      admins <- tgAdminsChatId.flatTraverse(id =>
+                        organizationRepo
+                          .getOrganizationMemberByTgUserId(id)
+                          .map(_.toList)
+                      )
+                      _ <- admins.traverse(orgMember =>
+                        chatRepo.addMember(
+                          chatId,
+                          orgMember.id,
+                          ChatMemberRole.Admin
+                        )
+                      )
+                      _ <- loggerOrg.debug("The chat was created")
+                      inviteLink <- tgGroup.exportInviteLink
+                      _ <- tgGroup.send(
+                        s"The chat was successfully connected to your organization. Now, you can invite members of y organization to the chat. $inviteLink"
+                      )
+                    } yield ()
+                  case None =>
+                    tgGroup
+                      .send(
+                        "The chat can't be connected with your organization because the owner of this chat isn't the admin of your AD organization."
+                      ) *> logger.warn(
+                      "Can't connect the organization to the chat"
                     )
-                  } yield ()
-                case None =>
-                  tgGroup
-                    .send(
-                      "The chat can't be connected with your organization because the owner of this chat isn't the admin of your AD organization."
-                    ) *> logger.warn(
-                    "Can't connect the organization to the chat"
-                  )
-              }
+                }
+            }
 
           }
 

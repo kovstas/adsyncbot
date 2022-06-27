@@ -23,15 +23,15 @@ object Main extends IOApp {
 
       implicit0(telegramClient: TelegramClient[IO]) = TelegramClient
         .fromHttp4sClient[IO](
-          appConfig.token
+          appConfig.tg.token
         )(httpClient)
 
-      appServices = AppServices(repos, httpClient, appConfig.ms)
+      appServices = AppServices(repos, httpClient, appConfig)
       _ <- Processes(appServices)
 
       _ <- HttpServer.make[IO](
         appConfig.port,
-        appConfig.botUri,
+        appConfig.tg.botUri,
         appServices.oAuthService
       )
 

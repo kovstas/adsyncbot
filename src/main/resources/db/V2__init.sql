@@ -5,7 +5,7 @@ CREATE TABLE "user"
     id         uuid PRIMARY KEY         NOT NULL,
     name       VARCHAR                  NOT NULL,
     is_active  BOOLEAN                  NOT NULL,
-    tg_chat_id INTEGER                  NOT NULL UNIQUE,
+    tg_chat_id BIGINT                   NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
@@ -38,7 +38,7 @@ CREATE TABLE organization_member
 CREATE TABLE chat
 (
     id              uuid                     NOT NULL PRIMARY KEY,
-    tg_chat_id      INTEGER                  NOT NULL UNIQUE,
+    tg_chat_id      BIGINT                   NOT NULL UNIQUE,
     organization_id uuid                     NOT NULL REFERENCES organization (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     name            VARCHAR,
     created_at      TIMESTAMP WITH TIME ZONE NOT NULL,
