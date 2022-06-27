@@ -81,7 +81,7 @@ final class DefaultChatService[F[
                     .debug(s"User ${orgMember.userId} was added to the chat.")
               case _ =>
                 tgGroup.send(
-                  s"The user ${tgUser.firstName} doesn't have an access to this chat."
+                  s"The user ${tgUser.firstName} was removed because it doesn't have access to your organization. Please, try adding this user after logging in."
                 ) *>
                   tgGroup.kickUser(tgUser.id).void
             }
@@ -160,7 +160,7 @@ final class DefaultChatService[F[
                 case None =>
                   tgGroup
                     .send(
-                      "Can't connect your organization to the chat. The owner of the chat should be the owner of your organization."
+                      "The chat can't be connected with your organization because the owner of this chat isn't the admin of your AD organization."
                     ) *> logger.warn(
                     "Can't connect the organization to the chat"
                   )

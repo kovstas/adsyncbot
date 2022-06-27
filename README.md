@@ -4,9 +4,9 @@ The bot ties your organization members in Active Directory (AD) with the corresp
 ## Usage
 
 ### Admin
-For synchronisation, you should be an administrator of your organization and you need to follow these steps:
+For synchronisation, you should be an administrator of your organization, and you need to follow these steps:
 1. Add the AD app "AD telegram sync app" to your AD organization.
-2. Run `/start` command in a private chat with the bot and follow the bot's instructions.
+2. Run `/start` command in a private chat with the bot and follow the bot instructions.
 
 After you can work with this bot in chats. As the bot is added, run `/start` command in the chat.
 

@@ -55,15 +55,15 @@ final class DefaultUserService[F[_]: Monad: TelegramClient: StructuredLogger](
             if (member.isActive) {
               if (organization.createdBy == user.id)
                 chat.send(
-                  s"You've already synchronized your ${organization.name} organization."
+                  s"You've already synchronized your ${organization.name} organization. Now you can add the bot to your telegram chats."
                 )
               else
                 chat.send(
-                  s"You've already connected to ${organization.name} organization."
+                  s"You've already connected to ${organization.name} organization. You can ask the admin of organization to add you to organization telegram chats."
                 )
             } else {
               chat.send(
-                s"Your user was deactivated. Please try to login as the member of ${organization.name} organization",
+                s"Your AD user was deactivated. Please, try logging in as the member of ${organization.name} organization",
                 keyboard = Inline(
                   InlineKeyboardMarkup.singleButton(
                     loginAsOrganizationMemberButton(
@@ -105,7 +105,7 @@ final class DefaultUserService[F[_]: Monad: TelegramClient: StructuredLogger](
   private def sendHelloMsg(chat: Chat, userId: UserId): F[Unit] =
     chat
       .send(
-        "Hello. I'm a AD synchronizer bot. ",
+        "Hello. I'm a AD synchronizer bot. I will help you either to synchronize your AD organization or sign in as a organization member. What can I do for you?",
         keyboard = Inline(
           InlineKeyboardMarkup.singleColumn(
             Seq(

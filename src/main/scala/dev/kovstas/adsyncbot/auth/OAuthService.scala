@@ -53,17 +53,17 @@ final class DefaultOAuthService[
         case Right((orgName, _)) =>
           logger.debug(s"Organization member was added to $orgName") *>
             userChat.send(
-              s"You successfully connected with $orgName organization. "
+              s"You successfully connected with '$orgName' organization. You can ask the admin of organization to add you to organization telegram chats."
             )
         case Left(e @ OrganizationNotFound(name)) =>
           logger.warn(e)(e.getMessage) *>
             userChat.send(
-              s"I couldn't find your organization $name. Please, ask administrator of your organization to setup synchronization with the bot first."
+              s"I couldn't find your organization '$name'. Please, ask the admin of your organization to set up synchronization with the bot first."
             )
         case Left(e) =>
           logger.error(e)(e.getMessage) *>
             userChat.send(
-              s"Sorry, I couldn't connect you with your organization due to an unknown error"
+              s"Sorry, I couldn't connect you with your organization due to an unknown error. Please, write about the problem to the bot maintainer."
             )
       }
 
@@ -85,7 +85,7 @@ final class DefaultOAuthService[
             case Right(name) =>
               chat
                 .send(
-                  s"Setup AD synchronization of '$name' organization is finished. Please log in as a organization member.",
+                  s"Setting up synchronization of '$name' AD organization is finished. Please, sign in as a member of your organization.",
                   keyboard = Inline(
                     InlineKeyboardMarkup.singleButton(
                       loginAsOrganizationMemberButton(
@@ -112,7 +112,7 @@ final class DefaultOAuthService[
   private def sendFailMsgOrganizationLogin(chat: PrivateChat): F[Unit] =
     chat
       .send(
-        "Can't login to your organization. Try to check your permissions. You should be the admin of your organization."
+        "Sorry, setting up synchronization of your AD organization is failed. Please, check if you are the admin of your organization and 'AD telegram sync app' AD app was added to your organization."
       )
       .void
 
