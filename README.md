@@ -1,10 +1,9 @@
 # AD Sync Telegram Bot [WIP]
 
-A bot for synchronization your AD organization with Telegram entities.
-With this bot, you can authorise members of your organization in Telegram chats.
+The bot ties your organization members in Active Directory (AD) with the corresponded user in Telegram.
 
 ## Usage
-Just start the bot https://t.me/AdSyncBot and follow instructions.
+Just start the bot [@AdSyncBot](https://t.me/AdSyncBot) and follow its instructions.
 
 ## Features
 - [x] delete inactive organization members from telegram chats
