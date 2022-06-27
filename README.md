@@ -28,6 +28,9 @@ After you can run the app with the command `sbt reStart`.
 You can check work of the app with `http://localhost:8080/api/v1/health` endpoint or just send command `/start` to your bot in Telegram either.
 
 ## AD Application Settings
+If you want to connect the bot to your AD application, you can use settings below.
+[How register an application link](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
+
 ### Authentication
 - Redirect URIs:
   - `YOUR_DOMAIN/api/v1/auth/organization-login`
