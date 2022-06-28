@@ -5,11 +5,11 @@ import cats.effect.Spawn
 import cats.effect.kernel.{Resource, Temporal}
 import dev.kovstas.adsyncbot.organization.OrganizationProcess
 import dev.kovstas.adsyncbot.telegram.TelegramProcess
-import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.StructuredLogger
 
 object Processes {
 
-  def apply[F[_]: Temporal: TelegramClient: Logger](
+  def apply[F[_]: Temporal: TelegramClient: StructuredLogger](
       appServices: AppServices[F]
   ): Resource[F, Unit] = {
     val tgProcess = new TelegramProcess[F](
