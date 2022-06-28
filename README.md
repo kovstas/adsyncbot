@@ -1,5 +1,5 @@
 # AD Sync Telegram Bot [WIP]
-The bot connects your organization members in Active Directory (AD) with telegram users.
+A telegram bot connects your organization members in Active Directory (AD) with telegram users.
 
 ## Usage
 
