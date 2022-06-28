@@ -1,5 +1,8 @@
 package dev.kovstas.adsyncbot.organization
 
+import canoe.api.{TelegramClient, chatApi}
+import canoe.models.PrivateChat
+import canoe.syntax._
 import cats.MonadThrow
 import cats.syntax.all._
 import dev.kovstas.adsyncbot.auth.OrganizationNotFound
@@ -24,7 +27,7 @@ trait OrganizationService[F[_]] {
 }
 
 final class DefaultOrganizationService[
-    F[_]: MonadThrow: StructuredLogger
+    F[_]: MonadThrow: TelegramClient: StructuredLogger
 ](
     applicationGraphApi: ApplicationGraphApi[F],
     userGraphApi: UserGraphApi[F],
@@ -87,12 +90,13 @@ final class DefaultOrganizationService[
       members <- organizations.flatTraverse(o =>
         organizationRepo
           .getActiveOrganizationMembers(o.id)
-          .map(_.map((_, o.adTenantId)))
+          .map(_.map((_, o.name, o.adTenantId)))
       )
-      _ <- members.traverse { case (orgMember, orgTenantId) =>
+      _ <- members.traverse { case (orgMember, name, orgTenantId) =>
         val logger = StructuredLogger[F].addContext(
           "userId" -> orgMember.userId.value.toString,
-          "organizationId" -> orgMember.organizationId.value
+          "organizationId" -> orgMember.organizationId.value.toString,
+          "organizationMemberId" -> orgMember.id.value.toString
         )
         applicationGraphApi.user(orgTenantId, orgMember.adUserId).flatMap {
           case Some(user) if user.accountEnabled =>
@@ -100,7 +104,13 @@ final class DefaultOrganizationService[
           case _ =>
             for {
               _ <- organizationRepo.deactivateMember(orgMember.id)
+              tgPrivateChat <- organizationRepo.getTgMemberId(orgMember.id)
               _ <- chatService.kickUser(orgMember.organizationId, orgMember.id)
+              _ <- tgPrivateChat.traverse(id =>
+                PrivateChat(id.value, None, None, None).send(
+                  s"You was deactivated in '$name' organization."
+                )
+              )
               _ <- logger.debug(s"User was deactivated.")
             } yield ()
         }

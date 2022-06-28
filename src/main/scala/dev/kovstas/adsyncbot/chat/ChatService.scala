@@ -194,7 +194,10 @@ final class DefaultChatService[F[
       _ <- chats.traverse { chat =>
         val userGroup = TgGroup(chat.tgChatId.value, chat.name)
         val logger = StructuredLogger[F].addContext(
-          Map("chatId" -> chat.id.value.toString)
+          Map(
+            "chatId" -> chat.id.value.toString,
+            "organizationMemberId" -> organizationMemberId.value.toString
+          )
         )
         organizationRepo.getTgMemberId(organizationMemberId).flatMap {
           case Some(tgChatId) =>
