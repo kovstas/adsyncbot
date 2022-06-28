@@ -39,7 +39,7 @@ final class DefaultUserGraphApi[F[_]: Concurrent](
   override def me(accessToken: String): F[UserResponse] = {
     val req = Request[F](
       GET,
-      config.graphUri / "me"
+      (config.graphUri / "me").withQueryParams(UserGraphParams)
     ).withHeaders(
       Authorization(Credentials.Token(AuthScheme.Bearer, accessToken))
     )

@@ -11,7 +11,8 @@ final case class UserResponse(
     id: AdUserId,
     businessPhones: List[String],
     displayName: String,
-    mail: String
+    mail: String,
+    accountEnabled: Boolean
 )
 
 object UserResponse {

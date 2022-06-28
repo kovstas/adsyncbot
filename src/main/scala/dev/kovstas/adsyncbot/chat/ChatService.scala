@@ -157,7 +157,7 @@ final class DefaultChatService[F[
                       _ <- loggerOrg.debug("The chat was created")
                       inviteLink <- tgGroup.exportInviteLink
                       _ <- tgGroup.send(
-                        s"The chat was successfully connected to your organization. Now, you can invite members of y organization to the chat. $inviteLink"
+                        s"The chat was successfully connected to your organization. Now, you can invite members of your organization to the chat. $inviteLink"
                       )
                     } yield ()
                   case None =>

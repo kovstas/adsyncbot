@@ -82,6 +82,7 @@ final class DefaultOrganizationService[
 
   override def checkOrganizationState: F[Unit] = {
     for {
+      _ <- StructuredLogger[F].debug("Start checking organizations...")
       organizations <- organizationRepo.getActiveOrganizations
       members <- organizations.flatTraverse(o =>
         organizationRepo
@@ -94,9 +95,9 @@ final class DefaultOrganizationService[
           "organizationId" -> orgMember.organizationId.value
         )
         applicationGraphApi.user(orgTenantId, orgMember.adUserId).flatMap {
-          case Some(_) =>
+          case Some(user) if user.accountEnabled =>
             logger.debug(s"User info was updated.") // TODO: updating info
-          case None =>
+          case _ =>
             for {
               _ <- organizationRepo.deactivateMember(orgMember.id)
               _ <- chatService.kickUser(orgMember.organizationId, orgMember.id)
@@ -104,6 +105,7 @@ final class DefaultOrganizationService[
             } yield ()
         }
       }
+      _ <- StructuredLogger[F].debug("Finish checking organizations")
     } yield ()
 
   }

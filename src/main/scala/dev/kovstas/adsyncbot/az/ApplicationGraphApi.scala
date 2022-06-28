@@ -32,7 +32,9 @@ final class DefaultApplicationGraphApi[F[_]: Concurrent](
     withAuth(tenantId) { auth =>
       val req = Request[F](
         GET,
-        config.graphUri / "users" / adUserId.value
+        (config.graphUri / "users" / adUserId.value).withQueryParams(
+          UserGraphParams
+        )
       ).withHeaders(auth)
       httpClient.expectOption(req)
     }
