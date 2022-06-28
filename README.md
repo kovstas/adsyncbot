@@ -17,7 +17,7 @@ Demo bot - [@AdSyncBot](https://t.me/AdSyncBot).
 
 ## Features
 - [x] delete inactive organization members from telegram chats
-- [ ] limit unauthorised users in chats
+- [x] limit unauthorised users in chats
 - [ ] associate a chat with AD group
 - [ ] send AD group's notifications to the corresponded chat
 - [ ] support a channel and a supergroup
